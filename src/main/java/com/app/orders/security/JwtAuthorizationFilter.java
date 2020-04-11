@@ -1,6 +1,6 @@
 package com.app.orders.security;
 
-import com.app.shop.utils.SecurityConstants;
+import com.app.orders.utils.SecurityConstants;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
