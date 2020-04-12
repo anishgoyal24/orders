@@ -13,15 +13,15 @@ import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication(exclude = { SecurityAutoConfiguration.class, ManagementWebSecurityAutoConfiguration.class })
 @ComponentScan(basePackages = {"com.app.orders"})
-//@EnableCaching
+@EnableCaching
 @EnableEurekaClient
 public class OrdersApplication {
 
-    @Bean
-    @LoadBalanced
-    public RestTemplate getRestTemplate(){
-        return new RestTemplate();
-    }
+//    @Bean
+//    @LoadBalanced
+//    public RestTemplate getRestTemplate(){
+//        return new RestTemplate();
+//    }
 
     public static void main(String[] args) {
         SpringApplication.run(OrdersApplication.class, args);
