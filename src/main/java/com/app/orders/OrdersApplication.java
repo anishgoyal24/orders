@@ -13,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication(exclude = { SecurityAutoConfiguration.class, ManagementWebSecurityAutoConfiguration.class })
 @ComponentScan(basePackages = {"com.app.orders"})
-@EnableCaching
+//@EnableCaching
 @EnableEurekaClient
 public class OrdersApplication {
 
