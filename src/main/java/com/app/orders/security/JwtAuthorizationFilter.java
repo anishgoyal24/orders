@@ -1,15 +1,13 @@
 package com.app.orders.security;
 
 import com.app.orders.utils.SecurityConstants;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SignatureException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
@@ -26,7 +24,7 @@ import java.util.stream.Collectors;
 
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
-    private static final Logger log = LoggerFactory.getLogger(JwtAuthorizationFilter.class);
+    private static final Logger log = LoggerFactory.getLogger(com.app.orders.security.JwtAuthorizationFilter.class);
 
     public JwtAuthorizationFilter(AuthenticationManager authenticationManager) {
         super(authenticationManager);
@@ -35,8 +33,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws IOException, ServletException {
-        var authentication = getAuthentication(request);
-        var header = request.getHeader(SecurityConstants.TOKEN_HEADER);
+        Authentication authentication = getAuthentication(request);
+        String header = request.getHeader(SecurityConstants.TOKEN_HEADER);
 
         if (StringUtils.isEmpty(header) || !header.startsWith(SecurityConstants.TOKEN_PREFIX)) {
             filterChain.doFilter(request, response);
@@ -48,20 +46,20 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     }
 
     private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request){
-        var token = request.getHeader(SecurityConstants.TOKEN_HEADER);
+        String token = request.getHeader(SecurityConstants.TOKEN_HEADER);
         if (!StringUtils.isEmpty(token)) {
             try {
-                var signingKey = SecurityConstants.JWT_SECRET.getBytes("UTF-8");
+                byte[] signingKey = SecurityConstants.JWT_SECRET.getBytes("UTF-8");
 
-                var parsedToken = Jwts.parser()
+                Jws<Claims> parsedToken = Jwts.parser()
                     .setSigningKey(signingKey)
                     .parseClaimsJws(token.substring(7));
 
-                var username = parsedToken
+                String username = parsedToken
                     .getBody()
                     .getSubject();
 
-                var authorities = ((List<?>) parsedToken.getBody()
+                List<SimpleGrantedAuthority> authorities = ((List<?>) parsedToken.getBody()
                     .get("rol")).stream()
                     .map(authority -> new SimpleGrantedAuthority((String) authority))
                     .collect(Collectors.toList());
