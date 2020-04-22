@@ -32,10 +32,12 @@ public class PartyDetails {
     private String secondaryPhone;
     @Column(nullable = false)
     private String city;
-    @Column(nullable = false)
-    private String state;
-    @Column(nullable = false)
-    private String country;
+    @OneToOne
+    @JoinColumn(name = "state", referencedColumnName = "STATE_FULL_CODE")
+    private State state;
+    @OneToOne
+    @JoinColumn(name = "country", referencedColumnName = "COUNTRY_CODE_3")
+    private Country country;
     @Column(nullable = false)
     private String pincode;
     private char status;

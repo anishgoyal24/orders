@@ -8,6 +8,7 @@ import com.app.orders.repository.customer.PartyStockRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -33,16 +34,16 @@ public class OrderService {
     }
 
 //  Place order
+    @Transactional(rollbackFor=Exception.class)
     public HashMap<String, Object> placeOrder(OrderHeader orderHeader){
         returnObject = new HashMap<>();
 //      Check if party exists
         if (detailsRepository.findByPartyId(orderHeader.getPartyDetails().getPartyId())!=null) {
 //          Generate a new order ID
             orderHeader.setOrderId(createOrderId(orderHeader.getPartyDetails().getPartyId()));
-//          Create a thread for booking the order
-//            TODO
-            returnObject.put("message", "waiting for confimation");
-            returnObject.put("data", orderHeader);
+//          Place order helper
+            placeOrderUtil(orderHeader);
+            returnObject.put("message", "Waiting for Confirmation");
         }
         else
             returnObject.put("message", "failure");
@@ -63,14 +64,14 @@ public class OrderService {
     public HashMap<String, Object> checkStock(OrderHeader orderHeader){
         returnObject = new HashMap<>();
         HashMap<Integer, Integer> outOfStock = new HashMap<>();
-        ArrayList<Float> discount = new ArrayList<>();
+        HashMap<Double, Float> discount = new HashMap<>();
         for (OrderDetail orderDetails: orderHeader.getOrderDetails()){
 //          Check stock of item
             Object[][] objects = partyStockRepository.findStockAndPrice(orderHeader.getPartyDetails().getState(), orderDetails.getItemDetails().getId());
             if ((int)objects[0][0] < orderDetails.getQuantity()){
                 outOfStock.put(orderDetails.getItemDetails().getId(), (int)objects[0][0]);
             }
-            discount.add((float)productService.getDiscount(orderDetails.getItemDetails().getId()).get("discount"));
+            discount.put(orderDetails.getId(), (float)productService.getDiscount(orderDetails.getItemDetails().getId()).get("discount"));
             orderDetails.setActualCost((int)objects[0][1]);
         }
         if (outOfStock.size()>0){
@@ -89,5 +90,11 @@ public class OrderService {
         returnObject.put("message", "success");
         returnObject.put("data", orders);
         return returnObject;
+    }
+
+
+//   Place order helper
+    public boolean placeOrderUtil(OrderHeader orderHeader){
+        return false;
     }
 }

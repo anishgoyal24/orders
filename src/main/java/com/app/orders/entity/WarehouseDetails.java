@@ -32,8 +32,12 @@ public class WarehouseDetails {
     @Column(name = "secondary_phone")
     private String secondaryPhone;
     private String city;
-    private String state;
-    private String country;
+    @OneToOne
+    @JoinColumn(name = "state", referencedColumnName = "STATE_FULL_CODE")
+    private State state;
+    @OneToOne
+    @JoinColumn(name = "country", referencedColumnName = "COUNTRY_CODE_3")
+    private Country country;
     private String pincode;
     private char status;
     private String type;
@@ -42,6 +46,8 @@ public class WarehouseDetails {
     @Column(name = "creation_date", updatable = false)
     private Date createDate;
     private String role;
+    @Column(name = "owner_warehouse")
+    private String ownerWarehouse;
 
     @Override
     public boolean equals(Object o) {

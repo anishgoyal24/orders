@@ -28,8 +28,12 @@ public class EmployeeDetails {
     @Column(name = "primary_phone", nullable = false, unique = true)
     private String primaryPhone;
     private String city;
-    private String state;
-    private String country;
+    @OneToOne
+    @JoinColumn(name = "state", referencedColumnName = "STATE_FULL_CODE")
+    private State state;
+    @OneToOne
+    @JoinColumn(name = "country", referencedColumnName = "COUNTRY_CODE_3")
+    private Country country;
     private String pincode;
     @Column(columnDefinition = "char default 'n'")
     private char status;
