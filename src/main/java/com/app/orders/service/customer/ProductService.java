@@ -1,9 +1,11 @@
 package com.app.orders.service.customer;
 
 import com.app.orders.entity.ItemDetails;
+import com.app.orders.entity.PincodeWarehouseMapping;
 import com.app.orders.repository.customer.DiscountRepository;
 import com.app.orders.repository.customer.PartyStockRepository;
 import com.app.orders.repository.customer.ProductRepository;
+import com.app.orders.repository.employee.PincodeMappingRepository;
 import com.app.orders.utils.ProductDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,8 @@ public class ProductService {
     private PartyStockRepository partyStockRepository;
     @Autowired
     private DiscountRepository discountRepository;
+    @Autowired
+    private PincodeMappingRepository pincodeMappingRepository;
 
     public HashMap<String, Object> searchItem(String searchQuery, String type){
         returnObject = new HashMap<>();
@@ -41,9 +45,9 @@ public class ProductService {
 
     public HashMap retrieveItem(Integer itemId, String state){
         returnObject = new HashMap<>();
-        Object[][] objects = partyStockRepository.findStockAndPrice(state, itemId);
+        Object[][] objects = partyStockRepository.findStockAndPrice(state, itemId, new ArrayList<>());
         if (objects.length>0 && objects!=null){
-            if ((long)objects[0][0]>0) {
+            if ((long)objects[0][0]>=0) {
                 returnObject.put("data", productRepository.findById(itemId));
                 returnObject.put("message", "success");
                 returnObject.put("itemId", itemId);
@@ -77,5 +81,23 @@ public class ProductService {
         }
         else returnObject.put("message", "no products");
         return returnObject;
+    }
+
+    public HashMap<String, Object> getStockAndPrice(int productId, String pincode){
+        returnObject = new HashMap<>();
+        List<PincodeWarehouseMapping> dynamic = pincodeMappingRepository.findByPincodeContaining(pincode);
+        List<Integer> dynamicIds = new ArrayList<>();
+        for (PincodeWarehouseMapping mapping: dynamic){
+            dynamicIds.add(mapping.getWarehouseDetails().getWarehouseId());
+        }
+        Object[][] found = partyStockRepository.findStockAndPrice(pincode, productId, dynamicIds);
+        if (found.length>0){
+            returnObject.put("stock", found[0][0]);
+            returnObject.put("price", found[0][1]);
+            returnObject.put("message", "success");
+        }
+        else returnObject.put("message", "Not available in your area.");
+        return returnObject;
+
     }
 }

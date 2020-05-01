@@ -12,7 +12,6 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "item_mst")
-@Cacheable
 public class ItemDetails {
 
     @Id

@@ -25,27 +25,25 @@ public class PincodeMappingService {
         this.warehouseDetailsRepository = warehouseDetailsRepository;
     }
 
-    public HashMap<String, Object> getWarehouses(String pincode){
+    public HashMap<String, Object> search(String pincode){
         returnObject = new HashMap<>();
-        WarehouseDetails owner = pincodeMappingRepository.findByWarehouseDetailsPincodeAndEnabled(pincode, 1);
-        if (owner!=null){
-            List<WarehouseDetails> dynamic = warehouseDetailsRepository.findDynamic(owner.getWarehouseId());
-            returnObject.put("static", owner);
-            returnObject.put("dynamic", dynamic);
+        List<PincodeWarehouseMapping> mappings = pincodeMappingRepository.findByPincodeContaining(pincode);
+        if (mappings!=null){
+            returnObject.put("data", mappings);
             returnObject.put("message", "success");
-            return returnObject;
         }
         else {
             returnObject.put("message", "No warehouse found!");
             returnObject.put("status", 404);
-            return returnObject;
         }
+        return returnObject;
     }
 
     public HashMap<String, Object> addMapping(PincodeWarehouseMapping pincodeWarehouseMapping){
         returnObject = new HashMap<>();
         PincodeWarehouseMapping found = pincodeMappingRepository.findByPincodeAndWarehouseDetailsWarehouseId(pincodeWarehouseMapping.getPincode(), pincodeWarehouseMapping.getWarehouseDetails().getWarehouseId());
         if (found==null){
+            pincodeWarehouseMapping.setWarehouseDetails(warehouseDetailsRepository.findById(pincodeWarehouseMapping.getWarehouseDetails().getWarehouseId()).get());
             pincodeWarehouseMapping.setEnabled(1);
             pincodeMappingRepository.save(pincodeWarehouseMapping);
             returnObject.put("message", "success");
@@ -61,12 +59,13 @@ public class PincodeMappingService {
         return returnObject;
     }
 
-    public HashMap<String, Object> disableMapping(Integer id){
+    public HashMap<String, Object> toggleMapping(Integer id){
         returnObject = new HashMap<>();
         Optional<PincodeWarehouseMapping> optional = pincodeMappingRepository.findById(id);
         if (optional.isPresent()){
             PincodeWarehouseMapping found = optional.get();
-            found.setEnabled(0);
+            if (found.getEnabled()==1)found.setEnabled(0);
+            else found.setEnabled(1);
             pincodeMappingRepository.save(found);
             returnObject.put("message", "success");
         }
@@ -74,4 +73,21 @@ public class PincodeMappingService {
         return returnObject;
     }
 
+    public HashMap<String, Object> listAll() {
+        returnObject = new HashMap<>();
+        returnObject.put("data", pincodeMappingRepository.findAll());
+        return returnObject;
+    }
+
+    public HashMap<String, Object> findTop10(){
+        returnObject = new HashMap<>();
+        returnObject.put("data", pincodeMappingRepository.findTop10ByOrderById());
+        return returnObject;
+    }
+
+    public HashMap<String, Object> findNext10(Integer id){
+        returnObject = new HashMap<>();
+        returnObject.put("data", pincodeMappingRepository.findFirst10ByIdLessThan(id));
+        return returnObject;
+    }
 }
