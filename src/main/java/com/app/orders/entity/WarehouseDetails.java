@@ -1,5 +1,7 @@
 package com.app.orders.entity;
 
+import com.app.orders.utils.View;
+import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -21,6 +23,7 @@ public class WarehouseDetails {
     @Column(length = 60)
     private String password;
     @Column(name = "warehouse_name", nullable = false)
+    @JsonView(View.PincodeMappingView.class)
     private String warehouseName;
     @Column(name = "warehouse_email", unique = true)
     private String warehouseEmail;

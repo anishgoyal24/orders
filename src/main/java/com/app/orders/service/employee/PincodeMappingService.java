@@ -81,7 +81,7 @@ public class PincodeMappingService {
 
     public HashMap<String, Object> findTop10(){
         returnObject = new HashMap<>();
-        returnObject.put("data", pincodeMappingRepository.findTop10ByOrderById());
+        returnObject.put("data", pincodeMappingRepository.findFirst10ByOrderById());
         return returnObject;
     }
 
