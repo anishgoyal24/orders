@@ -17,4 +17,7 @@ public interface PincodeMappingRepository extends JpaRepository<PincodeWarehouse
     List<PincodeWarehouseMapping> findFirst10ByOrderById();
 
     List<PincodeWarehouseMapping> findFirst10ByIdLessThan(Integer id);
+
+    @Query("select count(mapping) from PincodeWarehouseMapping mapping where mapping.pincode=:pincode")
+    int findCount(@Param("pincode") String pincode);
 }

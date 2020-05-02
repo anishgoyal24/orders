@@ -90,4 +90,11 @@ public class PincodeMappingService {
         returnObject.put("data", pincodeMappingRepository.findFirst10ByIdLessThan(id));
         return returnObject;
     }
+
+    public HashMap<String, Object> checkIfPresent(String pincode) {
+        returnObject = new HashMap<>();
+        int count = pincodeMappingRepository.findCount(pincode);
+        returnObject.put("count", count);
+        return returnObject;
+    }
 }

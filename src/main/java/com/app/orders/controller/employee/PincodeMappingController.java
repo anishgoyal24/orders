@@ -59,4 +59,10 @@ public class PincodeMappingController {
     public HashMap<String, Object> findNext10(@RequestParam Integer id){
         return pincodeMappingService.findNext10(id);
     }
+
+    @GetMapping(value = "/check-present")
+    @PreAuthorize("hasAnyAuthority('ROLE_party')")
+    public HashMap<String, Object> checkIfPresent(@RequestParam String pincode){
+        return pincodeMappingService.checkIfPresent(pincode);
+    }
 }
