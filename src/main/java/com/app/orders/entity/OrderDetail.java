@@ -13,7 +13,7 @@ public class OrderDetail {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "native")
-    private double id;
+    private long id;
     @OneToOne
     @JoinColumn(name = "item_id", referencedColumnName = "item_id")
     private ItemPackingDetails itemDetails;

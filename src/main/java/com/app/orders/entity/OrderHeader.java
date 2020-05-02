@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -23,8 +24,9 @@ public class OrderHeader {
     @JoinColumn(name = "party_id", nullable = false)
     private PartyDetails partyDetails;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "warehouse_id", nullable = false)
+    @JoinColumn(name = "warehouse_id")
     private WarehouseDetails warehouseDetails;
+    @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "order_date")
     private Date orderDate;
@@ -42,9 +44,11 @@ public class OrderHeader {
     private Date deliveryDate;
     @JsonIgnore
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "order_id", referencedColumnName = "order_id")
     private List<OrderDetail> orderDetails;
+    @Column(name = "total_cost")
+    private double totalCost;
 
     @Override
     public boolean equals(Object o) {

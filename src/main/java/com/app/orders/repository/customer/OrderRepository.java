@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface OrderRepository extends JpaRepository<OrderHeader, Integer> {
+public interface OrderRepository extends JpaRepository<OrderHeader, Double> {
 
     public List<OrderHeader> findByPartyDetailsPartyEmail(String email, Pageable pageable);
 }

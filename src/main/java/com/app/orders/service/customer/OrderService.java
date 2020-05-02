@@ -2,8 +2,10 @@ package com.app.orders.service.customer;
 
 import com.app.orders.entity.OrderDetail;
 import com.app.orders.entity.OrderHeader;
+import com.app.orders.entity.PartyDetails;
 import com.app.orders.repository.customer.DetailsRepository;
 import com.app.orders.repository.customer.OrderRepository;
+import com.app.orders.repository.customer.PackingRepository;
 import com.app.orders.repository.customer.PartyStockRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -24,26 +26,35 @@ public class OrderService {
     private ProductService productService;
     private HashMap<String, Object> returnObject;
     private OrderRepository orderRepository;
+    private PackingRepository packingRepository;
 
     @Autowired
-    public OrderService(DetailsRepository detailsRepository, PartyStockRepository partyStockRepository, ProductService productService, OrderRepository orderRepository) {
+    public OrderService(DetailsRepository detailsRepository, PartyStockRepository partyStockRepository, ProductService productService, OrderRepository orderRepository, PackingRepository packingRepository) {
         this.detailsRepository = detailsRepository;
         this.partyStockRepository = partyStockRepository;
         this.productService = productService;
         this.orderRepository = orderRepository;
+        this.packingRepository = packingRepository;
     }
 
 //  Place order
     @Transactional(rollbackFor=Exception.class)
     public HashMap<String, Object> placeOrder(OrderHeader orderHeader){
         returnObject = new HashMap<>();
+        PartyDetails found = detailsRepository.findByPartyId(orderHeader.getPartyDetails().getPartyId());
 //      Check if party exists
-        if (detailsRepository.findByPartyId(orderHeader.getPartyDetails().getPartyId())!=null) {
+        if (found!=null) {
 //          Generate a new order ID
             orderHeader.setOrderId(createOrderId(orderHeader.getPartyDetails().getPartyId()));
-//          Place order helper
-            placeOrderUtil(orderHeader);
-            returnObject.put("message", "Waiting for Confirmation");
+            orderHeader.setPartyDetails(found);
+//          TODO call notifications API
+            orderHeader.setStatus("Waiting for Confirmation");
+            for (OrderDetail orderDetail: orderHeader.getOrderDetails()){
+                orderDetail.setItemDetails(packingRepository.findById(orderDetail.getItemDetails().getId()).get());
+            }
+            orderRepository.save(orderHeader);
+            returnObject.put("message", "success");
+            returnObject.put("status", "Waiting for Confirmation");
         }
         else
             returnObject.put("message", "failure");
@@ -64,7 +75,7 @@ public class OrderService {
     public HashMap<String, Object> checkStock(OrderHeader orderHeader){
         returnObject = new HashMap<>();
         HashMap<Integer, Integer> outOfStock = new HashMap<>();
-        HashMap<Double, Float> discount = new HashMap<>();
+        HashMap<Long, Float> discount = new HashMap<>();
         for (OrderDetail orderDetails: orderHeader.getOrderDetails()){
 //          Check stock of item
             Object[][] objects = partyStockRepository.findStockAndPrice(orderHeader.getPartyDetails().getState().getStateFullCode(), orderDetails.getItemDetails().getId(), new ArrayList<>());
@@ -90,11 +101,5 @@ public class OrderService {
         returnObject.put("message", "success");
         returnObject.put("data", orders);
         return returnObject;
-    }
-
-
-//   Place order helper
-    public boolean placeOrderUtil(OrderHeader orderHeader){
-        return false;
     }
 }
