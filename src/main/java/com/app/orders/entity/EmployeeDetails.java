@@ -1,5 +1,7 @@
 package com.app.orders.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -19,6 +21,8 @@ public class EmployeeDetails {
     @Column(name = "emp_id")
     private int empId;
     @Column(length = 60)
+    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
     @Column(name = "emp_name", nullable = false)
     private String empName;

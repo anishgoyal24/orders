@@ -45,7 +45,7 @@ public class ProductService {
 
     public HashMap retrieveItem(Integer itemId, String state){
         returnObject = new HashMap<>();
-        Object[][] objects = partyStockRepository.findStockAndPrice(state, itemId, new ArrayList<>());
+        Object[][] objects = partyStockRepository.findStockAndPrice("", itemId, new ArrayList<>(), state);
         if (objects.length>0 && objects!=null){
             if ((long)objects[0][0]>=0) {
                 returnObject.put("data", productRepository.findById(itemId));
@@ -83,14 +83,14 @@ public class ProductService {
         return returnObject;
     }
 
-    public HashMap<String, Object> getStockAndPrice(int productId, String pincode){
+    public HashMap<String, Object> getStockAndPrice(int productId, String pincode, String state){
         returnObject = new HashMap<>();
         List<PincodeWarehouseMapping> dynamic = pincodeMappingRepository.findByPincodeContaining(pincode);
         List<Integer> dynamicIds = new ArrayList<>();
         for (PincodeWarehouseMapping mapping: dynamic){
             dynamicIds.add(mapping.getWarehouseDetails().getWarehouseId());
         }
-        Object[][] found = partyStockRepository.findStockAndPrice(pincode, productId, dynamicIds);
+        Object[][] found = partyStockRepository.findStockAndPrice(pincode, productId, dynamicIds, state);
         if (found.length>0){
             returnObject.put("stock", found[0][0]);
             returnObject.put("price", found[0][1]);

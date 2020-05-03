@@ -20,16 +20,21 @@ public class OrderHeader {
     @Id
     @Column(name = "order_id")
     private String orderId;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
+    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @JoinColumn(name = "party_id", nullable = false)
     private PartyDetails partyDetails;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
+    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @JoinColumn(name = "warehouse_id")
     private WarehouseDetails warehouseDetails;
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "order_date")
     private Date orderDate;
+    @Temporal(TemporalType.DATE)
     @Column(name = "expected_delivery_date")
     private Date expectedDeliveryDate;
     @Column(name = "payment_mode")
@@ -39,7 +44,7 @@ public class OrderHeader {
     private String closedBy;
     @Column(name = "received_by")
     private String receivedBy;
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.DATE)
     @Column(name = "delivery_date")
     private Date deliveryDate;
     @JsonIgnore

@@ -1,5 +1,7 @@
 package com.app.orders.entity;
 
+import com.app.orders.utils.View;
+import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,6 +11,7 @@ import javax.persistence.*;
 @Setter
 @Entity
 @Table(name = "STATE_DIR")
+@JsonView({View.OrderDetailView.class})
 public class State {
 
     @Id

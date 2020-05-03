@@ -1,5 +1,9 @@
 package com.app.orders.entity;
 
+import com.app.orders.utils.View;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,28 +21,37 @@ public class PartyDetails {
     @Column(name = "party_id")
     private int partyId;
     @Column(length = 60)
+    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
     @Column(name = "party_name", nullable = false)
+    @JsonView({View.OrderDetailView.class})
     private String partyName;
     @Column(name = "party_email", unique = true)
     private String partyEmail;
     @Column(name = "contact_person", nullable = false)
     private String contactPerson;
     @Column(length = 400, nullable = false)
+    @JsonView({View.OrderDetailView.class})
     private String address;
     @Column(name = "primary_phone", nullable = false, unique = true)
+    @JsonView({View.OrderDetailView.class})
     private String primaryPhone;
     @Column(name = "secondary_phone")
     private String secondaryPhone;
     @Column(nullable = false)
+    @JsonView({View.OrderDetailView.class})
     private String city;
     @OneToOne
     @JoinColumn(name = "state", referencedColumnName = "STATE_FULL_CODE")
+    @JsonView({View.OrderDetailView.class})
     private State state;
     @OneToOne
     @JoinColumn(name = "country", referencedColumnName = "COUNTRY_CODE_3")
+    @JsonView({View.OrderDetailView.class})
     private Country country;
     @Column(nullable = false)
+    @JsonView({View.OrderDetailView.class})
     private String pincode;
     private char status;
     @OneToOne

@@ -1,12 +1,10 @@
 package com.app.orders.service.customer;
 
+import com.app.orders.entity.Cart;
 import com.app.orders.entity.OrderDetail;
 import com.app.orders.entity.OrderHeader;
 import com.app.orders.entity.PartyDetails;
-import com.app.orders.repository.customer.DetailsRepository;
-import com.app.orders.repository.customer.OrderRepository;
-import com.app.orders.repository.customer.PackingRepository;
-import com.app.orders.repository.customer.PartyStockRepository;
+import com.app.orders.repository.customer.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -27,14 +25,16 @@ public class OrderService {
     private HashMap<String, Object> returnObject;
     private OrderRepository orderRepository;
     private PackingRepository packingRepository;
+    private CartRepository cartRepository;
 
     @Autowired
-    public OrderService(DetailsRepository detailsRepository, PartyStockRepository partyStockRepository, ProductService productService, OrderRepository orderRepository, PackingRepository packingRepository) {
+    public OrderService(DetailsRepository detailsRepository, PartyStockRepository partyStockRepository, ProductService productService, OrderRepository orderRepository, PackingRepository packingRepository, CartRepository cartRepository) {
         this.detailsRepository = detailsRepository;
         this.partyStockRepository = partyStockRepository;
         this.productService = productService;
         this.orderRepository = orderRepository;
         this.packingRepository = packingRepository;
+        this.cartRepository = cartRepository;
     }
 
 //  Place order
@@ -53,6 +53,8 @@ public class OrderService {
                 orderDetail.setItemDetails(packingRepository.findById(orderDetail.getItemDetails().getId()).get());
             }
             orderRepository.save(orderHeader);
+            List<Cart> cartList = cartRepository.findByPartyDetailsPartyId(found.getPartyId());
+            cartRepository.deleteAll(cartList);
             returnObject.put("message", "success");
             returnObject.put("status", "Waiting for Confirmation");
         }
@@ -78,7 +80,7 @@ public class OrderService {
         HashMap<Long, Float> discount = new HashMap<>();
         for (OrderDetail orderDetails: orderHeader.getOrderDetails()){
 //          Check stock of item
-            Object[][] objects = partyStockRepository.findStockAndPrice(orderHeader.getPartyDetails().getState().getStateFullCode(), orderDetails.getItemDetails().getId(), new ArrayList<>());
+            Object[][] objects = partyStockRepository.findStockAndPrice("", orderDetails.getItemDetails().getId(), new ArrayList<>(), orderHeader.getPartyDetails().getState().getStateFullCode());
             if ((int)objects[0][0] < orderDetails.getQuantity()){
                 outOfStock.put(orderDetails.getItemDetails().getId(), (int)objects[0][0]);
             }
@@ -95,9 +97,9 @@ public class OrderService {
     }
 
 //  Get orders by order email
-    public HashMap<String, Object> getOrders(String email) {
+    public HashMap<String, Object> getOrders(Integer partyId, int page) {
         returnObject = new HashMap<>();
-        List<OrderHeader> orders = orderRepository.findByPartyDetailsPartyEmail(email, PageRequest.of(0,10));
+        List<OrderHeader> orders = orderRepository.findByPartyDetailsPartyId(partyId, PageRequest.of(page,10));
         returnObject.put("message", "success");
         returnObject.put("data", orders);
         return returnObject;

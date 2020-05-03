@@ -21,7 +21,7 @@ public class ProductController {
 
     @GetMapping(value = "/get-price-stock")
     @PreAuthorize("hasAnyAuthority('ROLE_party')")
-    public HashMap<String, Object> findStockAnsPrice(@RequestParam int itemId, @RequestParam String pincode){
-        return productService.getStockAndPrice(itemId, pincode);
+    public HashMap<String, Object> findStockAnsPrice(@RequestParam int itemId, @RequestParam String pincode, @RequestParam String state){
+        return productService.getStockAndPrice(itemId, pincode, state);
     }
 }

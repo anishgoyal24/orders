@@ -37,7 +37,7 @@ public class OrderController {
 //  Get the order list of a user
     @GetMapping(value = "/list")
     @PreAuthorize("hasAnyAuthority('ROLE_party')")
-    public HashMap<String, Object> getOrder(@RequestParam String email){
-        return orderService.getOrders(email);
+    public HashMap<String, Object> getOrder(@RequestParam Integer partyId, @RequestParam Integer page){
+        return orderService.getOrders(partyId, page);
     }
 }

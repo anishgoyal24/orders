@@ -1,9 +1,12 @@
 package com.app.orders.entity;
 
+import com.app.orders.utils.View;
+import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -17,8 +20,10 @@ public class ItemDetails {
     @Id
     @Column(name = "item_id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "native")
+    @JsonView(View.OrderDetailView.class)
     private int itemId;
     @Column(name = "item_name", nullable = false)
+    @JsonView(View.OrderDetailView.class)
     private String itemName;
     private char status;
     private String description;

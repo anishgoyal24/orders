@@ -16,4 +16,6 @@ public interface ProductRepository extends JpaRepository<ItemDetails, Integer> {
 
     public List<ItemDetails> findByCustomerAllowedAndStatus(String customerAllowed, char status);
 
+    String findItemNameByItemId(Integer itemId);
+
 }
