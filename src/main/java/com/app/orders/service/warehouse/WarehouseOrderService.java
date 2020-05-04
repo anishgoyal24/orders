@@ -3,6 +3,7 @@ package com.app.orders.service.warehouse;
 import com.app.orders.entity.OrderDetail;
 import com.app.orders.entity.OrderHeader;
 import com.app.orders.entity.PartyDetails;
+import com.app.orders.entity.WarehouseDetails;
 import com.app.orders.repository.customer.ProductRepository;
 import com.app.orders.repository.warehouse.WarehouseDetailsRepository;
 import com.app.orders.repository.warehouse.WarehouseOrdersRepository;
@@ -60,7 +61,7 @@ public class WarehouseOrderService {
             if (orderHeader.getStatus().equals("Waiting for Confirmation")){
                 orderHeader.setStatus("Confirmed");
                 orderHeader.setWarehouseDetails(warehouseDetailsRepository.findById(Integer.parseInt(String.valueOf(body.get("warehouseId")))).get());
-                DateFormat simpleDateFormat=new SimpleDateFormat("dd-MM-yyyy");
+                DateFormat simpleDateFormat=new SimpleDateFormat("dd/MM/yyyy");
                 try {
                     orderHeader.setExpectedDeliveryDate(simpleDateFormat.parse(String.valueOf(body.get("expectedDeliveryDate"))));
                 } catch (ParseException e) {
@@ -85,6 +86,32 @@ public class WarehouseOrderService {
             returnObject.put("message", "success");
         }
         else returnObject.put("message", "failure");
+        return returnObject;
+    }
+
+    public HashMap<String, Object> getOrderIds(Integer warehouseId) {
+        returnObject = new HashMap<>();
+        List<String> orderIds = warehouseOrdersRepository.findByWarehouseDetailsWarehouseId(warehouseId);
+        returnObject.put("message", "success");
+        returnObject.put("data", orderIds);
+        return returnObject;
+    }
+
+    public HashMap<String, Object> transfer(HashMap<String, Object> transferObject) {
+        returnObject = new HashMap<>();
+        Optional<OrderHeader> optionalOrderHeader = warehouseOrdersRepository.findById(String.valueOf(transferObject.get("orderId")));
+        if (optionalOrderHeader.isPresent()){
+            OrderHeader orderHeader = optionalOrderHeader.get();
+            Optional<WarehouseDetails> optionalWarehouseDetails = warehouseDetailsRepository.findById((int)transferObject.get("dynamicWarehouseId"));
+            if (optionalWarehouseDetails.isPresent()){
+                WarehouseDetails warehouseDetails = optionalWarehouseDetails.get();
+                orderHeader.setWarehouseDetails(warehouseDetails);
+                warehouseOrdersRepository.save(orderHeader);
+                returnObject.put("message", "success");
+            }
+            else returnObject.put("message", "no such warehouse");
+        }
+        else returnObject.put("message", "no such order");
         return returnObject;
     }
 }

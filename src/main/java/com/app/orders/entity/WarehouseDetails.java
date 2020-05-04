@@ -54,7 +54,7 @@ public class WarehouseDetails {
     private Date createDate;
     private String role;
     @Column(name = "owner_warehouse")
-    private String ownerWarehouse;
+    private Integer ownerWarehouse;
 
     @Override
     public boolean equals(Object o) {

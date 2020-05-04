@@ -39,4 +39,20 @@ public class WarehouseOrdersController {
         return warehouseOrderService.changeStatus(body);
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_warehouse', 'ROLE_manager')")
+    @GetMapping(value = "/list/ids")
+    @JsonView(View.OrderDetailView.class)
+    public HashMap<String, Object> getOrderIds(@RequestParam Integer warehouseId){
+        return warehouseOrderService.getOrderIds(warehouseId);
+    }
+
+
+    @PreAuthorize("hasAnyAuthority('ROLE_warehouse', 'ROLE_manager')")
+    @PostMapping(value = "/transfer")
+    @JsonView(View.OrderDetailView.class)
+    public HashMap<String, Object> getOrderIds(@RequestBody HashMap<String, Object> transferObject){
+        return warehouseOrderService.transfer(transferObject);
+    }
+
+
 }
