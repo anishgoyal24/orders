@@ -11,10 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class OrderService {
@@ -102,6 +99,38 @@ public class OrderService {
         List<OrderHeader> orders = orderRepository.findByPartyDetailsPartyId(partyId, PageRequest.of(page,10));
         returnObject.put("message", "success");
         returnObject.put("data", orders);
+        return returnObject;
+    }
+
+//  Get Order Details
+    public HashMap<String, Object> getOrderDetails(String orderId){
+        returnObject = new HashMap<>();
+        List<OrderDetail> orderDetails = orderRepository.findOrderDetails(orderId);
+        List<HashMap<String, Object>> data = new ArrayList<>();
+        if (orderDetails.size()>0){
+            for (OrderDetail orderDetail : orderDetails){
+                HashMap<String, Object> items = new HashMap<>();
+                items.put("orderDetail", orderDetail);
+                items.put("itemName", orderDetail.getItemDetails().getItemDetails().getItemName());
+                data.add(items);
+            }
+            returnObject.put("message", "success");
+            returnObject.put("data", data);
+        }
+        else returnObject.put("message", "failure");
+        return returnObject;
+    }
+
+    public HashMap<String, Object> cancelOrder(String orderId) {
+        returnObject = new HashMap<>();
+        Optional<OrderHeader> orderHeaderOptional = orderRepository.findById(orderId);
+        if (orderHeaderOptional.isPresent()){
+            OrderHeader orderHeader = orderHeaderOptional.get();
+            orderHeader.setStatus("Cancelled");
+            orderRepository.save(orderHeader);
+            returnObject.put("message", "success");
+        }
+        else returnObject.put("message", "failure");
         return returnObject;
     }
 }

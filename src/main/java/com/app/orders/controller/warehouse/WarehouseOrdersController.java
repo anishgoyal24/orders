@@ -50,7 +50,7 @@ public class WarehouseOrdersController {
     @PreAuthorize("hasAnyAuthority('ROLE_warehouse', 'ROLE_manager')")
     @PostMapping(value = "/transfer")
     @JsonView(View.OrderDetailView.class)
-    public HashMap<String, Object> getOrderIds(@RequestBody HashMap<String, Object> transferObject){
+    public HashMap<String, Object> transfer(@RequestBody HashMap<String, Object> transferObject){
         return warehouseOrderService.transfer(transferObject);
     }
 

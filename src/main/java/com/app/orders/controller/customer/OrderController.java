@@ -40,4 +40,18 @@ public class OrderController {
     public HashMap<String, Object> getOrder(@RequestParam Integer partyId, @RequestParam Integer page){
         return orderService.getOrders(partyId, page);
     }
+
+//  Get Order Details
+    @GetMapping(value = "/party/details")
+    @PreAuthorize("hasAnyAuthority('ROLE_party')")
+    public HashMap<String, Object> getOrderDetails(@RequestParam String orderId){
+        return orderService.getOrderDetails(orderId);
+    }
+
+
+    @PostMapping(value = "/cancel")
+    @PreAuthorize("hasAnyAuthority('ROLE_party')")
+    public HashMap<String, Object> cancelOrder(@RequestBody String orderId){
+        return orderService.cancelOrder(orderId);
+    }
 }
