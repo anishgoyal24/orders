@@ -19,7 +19,7 @@ public class OrderDetail {
     private long id;
     @OneToOne
     @JsonView(View.OrderDetailView.class)
-    @JoinColumn(name = "item_id", referencedColumnName = "item_id")
+    @JoinColumn(name = "item_id", referencedColumnName = "id")
     private ItemPackingDetails itemDetails;
     @JsonView(View.OrderDetailView.class)
     private int quantity;

@@ -7,6 +7,7 @@ import com.app.orders.repository.employee.PincodeMappingRepository;
 import com.app.orders.repository.warehouse.WarehouseDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -39,6 +40,7 @@ public class PincodeMappingService {
         return returnObject;
     }
 
+    @Transactional(rollbackFor=Exception.class)
     public HashMap<String, Object> addMapping(PincodeWarehouseMapping pincodeWarehouseMapping){
         returnObject = new HashMap<>();
         PincodeWarehouseMapping found = pincodeMappingRepository.findByPincodeAndWarehouseDetailsWarehouseId(pincodeWarehouseMapping.getPincode(), pincodeWarehouseMapping.getWarehouseDetails().getWarehouseId());
@@ -59,6 +61,7 @@ public class PincodeMappingService {
         return returnObject;
     }
 
+    @Transactional(rollbackFor=Exception.class)
     public HashMap<String, Object> toggleMapping(Integer id){
         returnObject = new HashMap<>();
         Optional<PincodeWarehouseMapping> optional = pincodeMappingRepository.findById(id);
