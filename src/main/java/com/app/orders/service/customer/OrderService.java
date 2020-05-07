@@ -1,9 +1,6 @@
 package com.app.orders.service.customer;
 
-import com.app.orders.entity.Cart;
-import com.app.orders.entity.OrderDetail;
-import com.app.orders.entity.OrderHeader;
-import com.app.orders.entity.PartyDetails;
+import com.app.orders.entity.*;
 import com.app.orders.repository.customer.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -40,14 +37,17 @@ public class OrderService {
         returnObject = new HashMap<>();
         PartyDetails found = detailsRepository.findByPartyId(orderHeader.getPartyDetails().getPartyId());
 //      Check if party exists
-        if (found!=null) {
+        if (found!=null && found.getStatus()=='y') {
 //          Generate a new order ID
             orderHeader.setOrderId(createOrderId(orderHeader.getPartyDetails().getPartyId()));
             orderHeader.setPartyDetails(found);
 //          TODO call notifications API
             orderHeader.setStatus("Waiting for Confirmation");
             for (OrderDetail orderDetail: orderHeader.getOrderDetails()){
-                orderDetail.setItemDetails(packingRepository.findById(orderDetail.getItemDetails().getId()).get());
+                ItemPackingDetails itemPackingDetails = packingRepository.findById(orderDetail.getItemDetails().getId()).get();
+                if (itemPackingDetails.getStatus()=='y')
+                    orderDetail.setItemDetails(itemPackingDetails);
+                else orderHeader.getOrderDetails().remove(orderDetail);
             }
             orderRepository.save(orderHeader);
             List<Cart> cartList = cartRepository.findByPartyDetailsPartyId(found.getPartyId());
