@@ -19,6 +19,6 @@ public interface WarehouseOrdersRepository extends JpaRepository<OrderHeader, St
     @Query("select orderHeader.partyDetails from OrderHeader orderHeader where orderHeader.orderId=:orderId")
     PartyDetails findPartyDetailsByOrderId(@Param("orderId") String orderId);
 
-    @Query("select orderHeader.orderId from OrderHeader orderHeader where orderHeader.warehouseDetails.warehouseId=:warehouseId and NOT (orderHeader.status = 'Closed')")
+    @Query("select orderHeader.orderId from OrderHeader orderHeader where orderHeader.warehouseDetails.warehouseId=:warehouseId and orderHeader.status not like 'Closed' and orderHeader.status not like 'Cancelled'")
     List<String> findByWarehouseDetailsWarehouseId(@Param("warehouseId") Integer warehouseId);
 }

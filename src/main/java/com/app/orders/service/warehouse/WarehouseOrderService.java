@@ -118,4 +118,20 @@ public class WarehouseOrderService {
         else returnObject.put("message", "no such order");
         return returnObject;
     }
+
+    public HashMap<String, Object> closeOrder(HashMap<String, Object> transferObject) {
+        returnObject = new HashMap<>();
+        Optional<OrderHeader> optionalOrderHeader = warehouseOrdersRepository.findById(String.valueOf(transferObject.get("orderId")));
+        if (optionalOrderHeader.isPresent()){
+            OrderHeader orderHeader = optionalOrderHeader.get();
+            orderHeader.setClosedBy(String.valueOf(transferObject.get("closedBy")));
+            orderHeader.setReceivedBy(String.valueOf(transferObject.get("receivedBy")));
+            orderHeader.setStatus("Closed");
+            orderHeader.setDeliveryDate(new Date());
+            warehouseOrdersRepository.save(orderHeader);
+            returnObject.put("message", "success");
+        }
+        else returnObject.put("message", "no such order");
+        return returnObject;
+    }
 }

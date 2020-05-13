@@ -54,5 +54,12 @@ public class WarehouseOrdersController {
         return warehouseOrderService.transfer(transferObject);
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_warehouse', 'ROLE_manager')")
+    @PostMapping(value = "/close")
+    @JsonView(View.OrderDetailView.class)
+    public HashMap<String, Object> closeOrder(@RequestBody HashMap<String, Object> transferObject){
+        return warehouseOrderService.closeOrder(transferObject);
+    }
+
 
 }
