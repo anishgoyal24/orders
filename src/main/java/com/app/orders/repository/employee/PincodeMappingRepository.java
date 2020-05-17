@@ -1,7 +1,6 @@
 package com.app.orders.repository.employee;
 
 import com.app.orders.entity.PincodeWarehouseMapping;
-import com.app.orders.entity.WarehouseDetails;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,4 +19,6 @@ public interface PincodeMappingRepository extends JpaRepository<PincodeWarehouse
 
     @Query("select count(mapping) from PincodeWarehouseMapping mapping where mapping.pincode=:pincode")
     int findCount(@Param("pincode") String pincode);
+
+    PincodeWarehouseMapping findByWarehouseDetailsWarehouseIdAndPincode(Integer warehouseId, String pincode);
 }

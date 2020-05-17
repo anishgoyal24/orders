@@ -65,4 +65,10 @@ public class PincodeMappingController {
     public HashMap<String, Object> checkIfPresent(@RequestParam String pincode){
         return pincodeMappingService.checkIfPresent(pincode);
     }
+
+    @GetMapping(value = "/check")
+    @PreAuthorize("hasAnyAuthority('ROLE_warehouse', 'ROLE_manager')")
+    public HashMap<String, Object> checkIfServiceable(@RequestParam Integer warehouseId, @RequestParam String pincode){
+        return pincodeMappingService.checkIfServiceable(warehouseId, pincode);
+    }
 }

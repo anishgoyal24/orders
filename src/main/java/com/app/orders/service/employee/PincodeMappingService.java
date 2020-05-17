@@ -2,7 +2,6 @@ package com.app.orders.service.employee;
 
 
 import com.app.orders.entity.PincodeWarehouseMapping;
-import com.app.orders.entity.WarehouseDetails;
 import com.app.orders.repository.employee.PincodeMappingRepository;
 import com.app.orders.repository.warehouse.WarehouseDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,6 +97,16 @@ public class PincodeMappingService {
         returnObject = new HashMap<>();
         int count = pincodeMappingRepository.findCount(pincode);
         returnObject.put("count", count);
+        return returnObject;
+    }
+
+    public HashMap<String, Object> checkIfServiceable(Integer warehouseId, String pincode) {
+        returnObject = new HashMap<>();
+        PincodeWarehouseMapping pincodeWarehouseMapping = pincodeMappingRepository.findByWarehouseDetailsWarehouseIdAndPincode(warehouseId, pincode);
+        if (pincodeWarehouseMapping!=null){
+            returnObject.put("message", "serviceable");
+        }
+        else returnObject.put("message", "not serviceable");
         return returnObject;
     }
 }
