@@ -19,6 +19,7 @@ public class PartyDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "native")
     @Column(name = "party_id")
+    @JsonView(View.OrderDetailView.class)
     private int partyId;
     @Column(length = 60)
     @JsonIgnore
