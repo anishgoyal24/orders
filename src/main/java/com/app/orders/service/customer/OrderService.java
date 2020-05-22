@@ -96,7 +96,7 @@ public class OrderService {
 //  Get orders by order email
     public HashMap<String, Object> getOrders(Integer partyId, int page) {
         returnObject = new HashMap<>();
-        List<OrderHeader> orders = orderRepository.findByPartyDetailsPartyId(partyId, PageRequest.of(page,10));
+        List<OrderHeader> orders = orderRepository.findByPartyDetailsPartyIdOrderByOrderDateDesc(partyId, PageRequest.of(page,10));
         returnObject.put("message", "success");
         returnObject.put("data", orders);
         return returnObject;

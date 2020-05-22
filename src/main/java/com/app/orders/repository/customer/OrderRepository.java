@@ -13,7 +13,7 @@ import java.util.List;
 @Repository
 public interface OrderRepository extends JpaRepository<OrderHeader, String> {
 
-    public List<OrderHeader> findByPartyDetailsPartyId(Integer partyId, Pageable pageable);
+    public List<OrderHeader> findByPartyDetailsPartyIdOrderByOrderDateDesc(Integer partyId, Pageable pageable);
 
     @Query("select orderHeader.orderDetails from OrderHeader orderHeader where orderHeader.orderId=:orderId")
     List<OrderDetail> findOrderDetails(@Param("orderId") String orderId);
