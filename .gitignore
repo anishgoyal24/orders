@@ -30,7 +30,7 @@ build/
 ### VS Code ###
 .vscode/
 
-orders-0.0.1-SNAPSHOT.jar
+*.jar
 /logs.log
 /logs.log.2020-05-05.029089232104653.tmp
 /logs.log.2020-05-06.0.gz
