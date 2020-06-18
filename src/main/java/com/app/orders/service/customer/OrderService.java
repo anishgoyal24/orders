@@ -2,6 +2,7 @@ package com.app.orders.service.customer;
 
 import com.app.orders.entity.*;
 import com.app.orders.repository.customer.*;
+import com.app.orders.service.warehouse.WarehouseStockService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -20,15 +21,17 @@ public class OrderService {
     private OrderRepository orderRepository;
     private PackingRepository packingRepository;
     private CartRepository cartRepository;
+    private WarehouseStockService warehouseStockService;
 
     @Autowired
-    public OrderService(DetailsRepository detailsRepository, PartyStockRepository partyStockRepository, ProductService productService, OrderRepository orderRepository, PackingRepository packingRepository, CartRepository cartRepository) {
+    public OrderService(DetailsRepository detailsRepository, PartyStockRepository partyStockRepository, ProductService productService, OrderRepository orderRepository, PackingRepository packingRepository, CartRepository cartRepository, WarehouseStockService warehouseStockService) {
         this.detailsRepository = detailsRepository;
         this.partyStockRepository = partyStockRepository;
         this.productService = productService;
         this.orderRepository = orderRepository;
         this.packingRepository = packingRepository;
         this.cartRepository = cartRepository;
+        this.warehouseStockService = warehouseStockService;
     }
 
 //  Place order
@@ -121,12 +124,14 @@ public class OrderService {
         return returnObject;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public HashMap<String, Object> cancelOrder(String orderId) {
         returnObject = new HashMap<>();
         Optional<OrderHeader> orderHeaderOptional = orderRepository.findById(orderId);
         if (orderHeaderOptional.isPresent()){
             OrderHeader orderHeader = orderHeaderOptional.get();
             orderHeader.setStatus("Cancelled");
+            warehouseStockService.plus(orderHeader);
             orderRepository.save(orderHeader);
             returnObject.put("message", "success");
         }

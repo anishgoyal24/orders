@@ -4,7 +4,6 @@ import com.app.orders.entity.OrderDetail;
 import com.app.orders.entity.OrderHeader;
 import com.app.orders.entity.PartyDetails;
 import com.app.orders.entity.WarehouseDetails;
-import com.app.orders.repository.customer.ProductRepository;
 import com.app.orders.repository.warehouse.WarehouseDetailsRepository;
 import com.app.orders.repository.warehouse.WarehouseOrdersRepository;
 import org.slf4j.Logger;
@@ -13,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.swing.text.html.Option;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -27,11 +25,13 @@ public class WarehouseOrderService {
     private WarehouseOrdersRepository warehouseOrdersRepository;
     private HashMap<String, Object> returnObject;
     private WarehouseDetailsRepository warehouseDetailsRepository;
+    private WarehouseStockService warehouseStockService;
 
     @Autowired
-    public WarehouseOrderService(WarehouseOrdersRepository warehouseOrdersRepository, WarehouseDetailsRepository warehouseDetailsRepository) {
+    public WarehouseOrderService(WarehouseOrdersRepository warehouseOrdersRepository, WarehouseDetailsRepository warehouseDetailsRepository, WarehouseStockService warehouseStockService) {
         this.warehouseOrdersRepository = warehouseOrdersRepository;
         this.warehouseDetailsRepository = warehouseDetailsRepository;
+        this.warehouseStockService = warehouseStockService;
     }
 
     public HashMap<String, Object> getOrderDetails(String orderId){
@@ -67,8 +67,9 @@ public class WarehouseOrderService {
                 try {
                     orderHeader.setExpectedDeliveryDate(simpleDateFormat.parse(String.valueOf(body.get("expectedDeliveryDate"))));
                 } catch (ParseException e) {
-                    returnObject.put("message", "date parse exception");
+                    returnObject.put("date error", "date parse exception");
                 }
+                warehouseStockService.minus(orderHeader);
                 warehouseOrdersRepository.save(orderHeader);
                 returnObject.put("message", "success");
             }
