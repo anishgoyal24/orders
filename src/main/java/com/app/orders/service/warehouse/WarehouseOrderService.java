@@ -1,9 +1,8 @@
 package com.app.orders.service.warehouse;
 
-import com.app.orders.entity.OrderDetail;
-import com.app.orders.entity.OrderHeader;
-import com.app.orders.entity.PartyDetails;
-import com.app.orders.entity.WarehouseDetails;
+import com.app.orders.entity.*;
+import com.app.orders.repository.customer.DetailsRepository;
+import com.app.orders.repository.customer.PackingRepository;
 import com.app.orders.repository.warehouse.WarehouseDetailsRepository;
 import com.app.orders.repository.warehouse.WarehouseOrdersRepository;
 import org.slf4j.Logger;
@@ -26,12 +25,16 @@ public class WarehouseOrderService {
     private HashMap<String, Object> returnObject;
     private WarehouseDetailsRepository warehouseDetailsRepository;
     private WarehouseStockService warehouseStockService;
+    private PackingRepository packingRepository;
+    private DetailsRepository detailsRepository;
 
     @Autowired
-    public WarehouseOrderService(WarehouseOrdersRepository warehouseOrdersRepository, WarehouseDetailsRepository warehouseDetailsRepository, WarehouseStockService warehouseStockService) {
+    public WarehouseOrderService(WarehouseOrdersRepository warehouseOrdersRepository, WarehouseDetailsRepository warehouseDetailsRepository, WarehouseStockService warehouseStockService, PackingRepository packingRepository, DetailsRepository detailsRepository) {
         this.warehouseOrdersRepository = warehouseOrdersRepository;
         this.warehouseDetailsRepository = warehouseDetailsRepository;
         this.warehouseStockService = warehouseStockService;
+        this.packingRepository = packingRepository;
+        this.detailsRepository = detailsRepository;
     }
 
     public HashMap<String, Object> getOrderDetails(String orderId){
@@ -86,6 +89,10 @@ public class WarehouseOrderService {
         if (optionalOrderHeader.isPresent()){
             OrderHeader orderHeader = optionalOrderHeader.get();
             orderHeader.setStatus(String.valueOf(body.get("status")));
+            if (String.valueOf(body.get("status")).equals("Closed")){
+                orderHeader.setDeliveryDate(new Date());
+                orderHeader.setClosedBy(orderHeader.getWarehouseDetails().getWarehouseName());
+            }
             warehouseOrdersRepository.save(orderHeader);
             returnObject.put("message", "success");
         }
@@ -120,6 +127,7 @@ public class WarehouseOrderService {
         return returnObject;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public HashMap<String, Object> closeOrder(HashMap<String, Object> transferObject) {
         returnObject = new HashMap<>();
         Optional<OrderHeader> optionalOrderHeader = warehouseOrdersRepository.findById(String.valueOf(transferObject.get("orderId")));
@@ -134,5 +142,43 @@ public class WarehouseOrderService {
         }
         else returnObject.put("message", "no such order");
         return returnObject;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public HashMap<String, Object> addOrder(OrderHeader orderHeader) {
+        returnObject = new HashMap<>();
+        PartyDetails cashParty = detailsRepository.findByPartyEmail("cashcounter@na.com");
+        orderHeader.setOrderId(createOrderId(orderHeader.getPartyDetails().getPartyId()));
+        orderHeader.setPartyDetails(cashParty);
+        Optional<WarehouseDetails> found = warehouseDetailsRepository.findById(orderHeader.getWarehouseDetails().getWarehouseId());
+        if (found.isPresent()){
+            WarehouseDetails warehouseDetails = found.get();
+            orderHeader.setWarehouseDetails(warehouseDetails);
+            for (OrderDetail orderDetail: orderHeader.getOrderDetails()){
+                ItemPackingDetails itemPackingDetails = packingRepository.findById(orderDetail.getItemDetails().getId()).get();
+                if (itemPackingDetails.getStatus()=='y')
+                    orderDetail.setItemDetails(itemPackingDetails);
+                else orderHeader.getOrderDetails().remove(orderDetail);
+            }
+            orderHeader.setClosedBy(warehouseDetails.getWarehouseName());
+            orderHeader.setDeliveryDate(new Date());
+            orderHeader.setOrderDate(orderHeader.getDeliveryDate());
+            orderHeader.setExpectedDeliveryDate(orderHeader.getDeliveryDate());
+            orderHeader.setReceivedBy("Cash Counter");
+            warehouseOrdersRepository.save(orderHeader);
+            returnObject.put("message", "success");
+        }
+        else returnObject.put("message", "failure");
+        return returnObject;
+    }
+
+
+
+    //  Helper function to generate orderId
+    private String createOrderId(int partyId){
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("ddssMMmmyyyyHH");
+        Date date = new Date();
+        String orderId = simpleDateFormat.format(date) + partyId;
+        return orderId;
     }
 }

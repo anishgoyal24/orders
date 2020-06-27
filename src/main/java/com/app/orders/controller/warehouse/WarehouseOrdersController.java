@@ -1,5 +1,6 @@
 package com.app.orders.controller.warehouse;
 
+import com.app.orders.entity.OrderHeader;
 import com.app.orders.service.warehouse.WarehouseOrderService;
 import com.app.orders.utils.View;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -62,4 +63,10 @@ public class WarehouseOrdersController {
     }
 
 
+    @PreAuthorize("hasAnyAuthority('ROLE_warehouse', 'ROLE_manager')")
+    @PostMapping(value = "/add")
+    @JsonView(View.OrderDetailView.class)
+    public HashMap<String, Object> addOrder(@RequestBody OrderHeader orderHeader){
+        return warehouseOrderService.addOrder(orderHeader);
+    }
 }
