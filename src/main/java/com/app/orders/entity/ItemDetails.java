@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -26,6 +25,7 @@ public class ItemDetails {
     @JsonView(View.OrderDetailView.class)
     private String itemName;
     private char status;
+    @Column(length = 10000)
     private String description;
     @OneToMany(mappedBy = "itemDetails", cascade = CascadeType.PERSIST)
 //    @Cascade({org.hibernate.annotations.CascadeType.SAVE_UPDATE, org.hibernate.annotations.CascadeType.PERSIST})
