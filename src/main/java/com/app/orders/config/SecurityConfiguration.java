@@ -30,7 +30,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter implemen
         http.cors().and()
             .csrf().disable()
             .authorizeRequests()
-            .antMatchers("/user/authenticate").permitAll().antMatchers("/customer/new/**", "/verify/**", "/static/**", "/images/**").permitAll()
+            .antMatchers("/user/authenticate").permitAll().antMatchers("/customer/new", "/verify/**", "/static/**", "/images/**").permitAll()
             .anyRequest().authenticated()
             .and()
             .addFilter(new JwtAuthenticationFilter(authenticationManager()))
