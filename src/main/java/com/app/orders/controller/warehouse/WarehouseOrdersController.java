@@ -64,7 +64,7 @@ public class WarehouseOrdersController {
 
 
     @PreAuthorize("hasAnyAuthority('ROLE_warehouse', 'ROLE_manager')")
-    @PostMapping(value = "/add")
+    @PostMapping(value = "/add-cash")
     @JsonView(View.OrderDetailView.class)
     public HashMap<String, Object> addOrder(@RequestBody OrderHeader orderHeader){
         return warehouseOrderService.addOrder(orderHeader);
