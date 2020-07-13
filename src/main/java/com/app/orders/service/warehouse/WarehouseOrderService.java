@@ -148,7 +148,7 @@ public class WarehouseOrderService {
     public HashMap<String, Object> addOrder(OrderHeader orderHeader) {
         returnObject = new HashMap<>();
         PartyDetails cashParty = detailsRepository.findByPartyEmail("cashcounter@na.com");
-        orderHeader.setOrderId(createOrderId(orderHeader.getPartyDetails().getPartyId()));
+        orderHeader.setOrderId(createOrderId(cashParty.getPartyId()));
         orderHeader.setPartyDetails(cashParty);
         Optional<WarehouseDetails> found = warehouseDetailsRepository.findById(orderHeader.getWarehouseDetails().getWarehouseId());
         if (found.isPresent()){
@@ -167,6 +167,7 @@ public class WarehouseOrderService {
             orderHeader.setReceivedBy("Cash Counter");
             warehouseOrdersRepository.save(orderHeader);
             returnObject.put("message", "success");
+            warehouseStockService.minus(orderHeader);
         }
         else returnObject.put("message", "failure");
         return returnObject;
