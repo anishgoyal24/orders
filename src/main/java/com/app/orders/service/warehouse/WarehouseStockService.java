@@ -7,6 +7,7 @@ import com.app.orders.entity.WarehouseDetails;
 import com.app.orders.repository.warehouse.WarehouseStockRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class WarehouseStockService {
@@ -19,6 +20,7 @@ public class WarehouseStockService {
     }
 
 
+    @Transactional(rollbackFor=Exception.class)
     public void minus (OrderHeader orderHeader){
         WarehouseDetails warehouseDetails = orderHeader.getWarehouseDetails();
         for (OrderDetail orderDetail : orderHeader.getOrderDetails()) {
@@ -28,6 +30,7 @@ public class WarehouseStockService {
         }
     }
 
+    @Transactional(rollbackFor=Exception.class)
     public void plus (OrderHeader orderHeader){
         WarehouseDetails warehouseDetails = orderHeader.getWarehouseDetails();
         if (warehouseDetails == null)return;
